@@ -14,12 +14,13 @@ class ArduinoCommunication:
             if self.ser.in_waiting:
                 message = self.ser.readline().decode('utf-8').rstrip()
                 self.read_queue.put(message)
+                print('Received:', received_message)
                 
     def write_to_arduino(self):
         while True:
             message = self.write_queue.get()
-            print("Sending", message)
             self.ser.write(message.encode('utf-8'))
+            print("Sent", message)
 
     def start_communication(self):
         read_thread = threading.Thread(target=self.read_from_arduino)
@@ -38,7 +39,7 @@ if __name__ == "__main__":
             # Example: read from Arduino
             while not arduino.read_queue.empty():
                 received_message = arduino.read_queue.get()
-                print('Received:', received_message)
+                # print('Received:', received_message)
             
             control_value = int(input("Enter an integer 1-5 for motor control"))
 
