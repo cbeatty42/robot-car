@@ -369,6 +369,8 @@ void loop() {
     if(Serial.available()){
       char ch = Serial.read();
       int cond = Serial.parseInt();
+      Serial.print(ch);
+      Serial.println(cond);
       if(ch =='D'){
         if(cond == 1/*condition 1*/){
           differential(-64,64);
