@@ -18,6 +18,7 @@ class ArduinoCommunication:
     def write_to_arduino(self):
         while True:
             message = self.write_queue.get()
+            print("Sending", message)
             self.ser.write(message.encode('utf-8'))
 
     def start_communication(self):
@@ -35,12 +36,11 @@ if __name__ == "__main__":
         
         while True:
             # Example: read from Arduino
-            if not arduino.read_queue.empty():
+            while not arduino.read_queue.empty():
                 received_message = arduino.read_queue.get()
-                print(f'Received: {received_message}')
+                print('Received:', received_message)
             
             control_value = int(input("Enter an integer 1-5 for motor control"))
-            print("Control value", control_value)
 
             # Example: write to Arduino
             if control_value == 1:#condition 1
