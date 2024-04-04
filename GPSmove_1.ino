@@ -295,7 +295,7 @@ void loop() {
    //put your main code here, to run repeatedly:
    estop();    //stop the robot if the remote is not active 
    //digitalWrite(Strobolight, LOW);
-   Throttle = pulseIn(Throttle_Pin, HIGH);
+   Throttle = pulseIn(Throttle_Pin, HIGH, 1000); // Maximum timeout of 1000us = 1 ms so that we don't stall the rest of the program
 
 // Heading = getHeading();
 // Serial.print("Heading: ");
@@ -369,6 +369,11 @@ void loop() {
     if(Serial.available()){
       char ch = Serial.read();
       int cond = Serial.parseInt();
+
+      // Clear the serial buffer after reading the desired data
+      while (Serial.available()) {
+        Serial.read();  // Read and discard one byte of data from the buffer
+      }
       Serial.print(ch);
       Serial.println(cond);
       if(ch =='D'){
