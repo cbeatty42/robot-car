@@ -1,8 +1,8 @@
 import TestCases
 import cv2
 import numpy as np
-
-state_list = ["Hard Left", "Veer Left", "Straight", "Veer Right", "Hard Right"]
+from QueueTest import ArduinoCommunication
+write_queue = None
 def rotate_and_crop(image):
     # Rotate image clockwise since our camera is sideways
     rotated_image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
@@ -61,10 +61,24 @@ def canny_edge_detection(image):
         # Get the bounding box of the largest contour
         x, y, w, h = cv2.boundingRect(tallest_contour)
         normalized_coordinate = x/width
-        cur_position = int(normalized_coordinate * 5)
-        
-        if cur_position != last_position and normalized_coordinate > 0.1 and normalized_coordinate < 0.9: # Only update position if coordinat is within an expected range and the position is not the same
-            print(state_list[cur_position])
+        normalized_height = h/height
+
+        # Set up to keep sidewalk edge around 2/3 of the way through the screen, to only do sharp turns or head towards the right when absolutely necessary
+        if normalized_coordinate < 0.2:
+            cur_position = "D1"
+        elif normalized_coordinate < 0.5:
+            cur_position = "D2"
+        elif normalized_coordinate < 0.725:
+            cur_position = "D3"
+        elif normalized_coordinate < 0.87:
+            cur_position = "D4"
+        else:
+            cur_position = "D5"
+
+        if cur_position != last_position and normalized_coordinate > 0.05 and normalized_coordinate < 0.95 and normalized_height >= 0.25 : # Only update position if coordinate is within an expected range, it is tall enough, and the position is not the same as prev
+            # print(state_list[cur_position])
+            if write_queue is not None:
+                write_queue.put(cur_position)
             last_position = cur_position
 
         
@@ -77,9 +91,12 @@ def canny_edge_detection(image):
     cv2.imshow(f'Detected Edge', image)
     # cv2.imshow('Canny Edges', edges)
     # cv2.imshow('Eroded Edges', eroded_edges)
-    cv2.imshow('Mask', thresh_closed)
+    # cv2.imshow('Mask', thresh_closed)
 
 
 if __name__ == "__main__":
-    TestCases.vmain(canny_edge_detection, resize_factor=0.3, video_path=r"RobotCam\WIN_20240402_14_58_52_Pro.mp4")
+    arduinoComm = ArduinoCommunication()
+    write_queue = arduinoComm.write_queue
+    arduinoComm.start_communication()
+    TestCases.vmain(canny_edge_detection, resize_factor=0.3, video_path=r"RobotCam\T7.mp4")
     # TestCases.main(canny_edge_detection)
