@@ -5,7 +5,7 @@ import cv2
 
 def main(process_image, resize_factor=0.3):
     # Path to the directory containing the images
-    images_dir = r'Robotics\Images'
+    images_dir = r'C:\Users\cbeat\IdeaProjects\Robotics\Images'
 
     # Get the list of files in the directory
     image_files = os.listdir(images_dir)
@@ -35,7 +35,7 @@ def vmain(process_image, resize_factor=0.3, video_path=r"ConcreteSidewalk.mp4"):
     cap = cv2.VideoCapture(video_path)
 
     if not cap.isOpened():
-        print("Error al abrir el video")
+        print("Error opening video")
         return
     counter = 0
     while True:
@@ -51,10 +51,10 @@ def vmain(process_image, resize_factor=0.3, video_path=r"ConcreteSidewalk.mp4"):
         frame = cv2.resize(frame, (0, 0), fx=resize_factor, fy=resize_factor) # Resize the image for visibility for users and to decrease resource usage
 
         process_image(frame)
-        # Detiene el programa si se presiona la tecla 'q'
-        if cv2.waitKey(15) & 0xFF == ord('q'):
+        # Stop program when 'q' is pressed
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Libera el objeto de captura y cierra todas las ventanas
+    # Free object and close all windows
     cap.release()
     cv2.destroyAllWindows()
